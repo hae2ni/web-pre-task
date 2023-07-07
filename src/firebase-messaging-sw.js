@@ -1,10 +1,9 @@
-import { initalizeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-
-import "@firebase/messaging";
-
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
+import "@firebase/messaging";
+import firebase from "firebase";
 const firebaseConfig = {
   apiKey: "AIzaSyDNyoLsnDzmay7XS2uB_CIIwuKGx26ZeRk",
   authDomain: "pre-gwasuoneshot.firebaseapp.com",
@@ -15,32 +14,50 @@ const firebaseConfig = {
   measurementId: "G-T2QDBQ3LHT",
 };
 
-const app = initalizeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-const messaging = getMessaging();
+const messaging = firebase.messaging();
 
-async function requestPermission() {
-  console.log("권한 요청 즁");
+// async function requestPermission() {
+//   console.log("권한 요청 즁");
 
-  const permission = await Notification.requestPermission();
-  if (permission === "denied") {
-    console.log("알림 허용 안됨");
-    return;
-  }
+//   const permission = await Notification.requestPermission();
+//   if (permission === "denied") {
+//     console.log("알림 허용 안됨");
+//     return;
+//   }
 
-  console.log("알림 권한이 허용됨");
+//   console.log("알림 권한이 허용됨");
 
-  const token = await getToken(messaging, {
-    vapidKey: import.meta.env.REACT_APP_VAPID_KEY,
+//   const token = await getToken(messaging, {
+//     vapidKey: import.meta.env.REACT_APP_VAPID_KEY,
+//   });
+
+//   if (token) console.log("token:", token);
+//   else console.log("Can not get Token");
+
+//   onMessage(messaging, (payload) => {
+//     console.log("메세지가 도착했습니다.", payload);
+//   });
+// }
+
+messaging
+  .requestPermission()
+  .then(function () {
+    console.log("허가");
+    return messaging.getToken();
+  })
+  .then(function (token) {
+    console.log(token);
+  })
+  .catch(function (err) {
+    console.log("fcm에러:", err);
   });
 
-  if (token) console.log("token:", token);
-  else console.log("Can not get Token");
+// requestPermission();
 
-  onMessage(messaging, (payload) => {
-    console.log("메세지가 도착했습니다.", payload);
-  });
-}
-
-requestPermission();
+messaging.onMessage(function (payload) {
+  console.log(payload.notification.title);
+  console.log(payload.notification.body);
+});
