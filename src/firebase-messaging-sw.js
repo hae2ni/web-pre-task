@@ -3,7 +3,7 @@ import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 import "@firebase/messaging";
-import firebase from "firebase";
+// import firebase from "firebase";
 const firebaseConfig = {
   apiKey: "AIzaSyDNyoLsnDzmay7XS2uB_CIIwuKGx26ZeRk",
   authDomain: "pre-gwasuoneshot.firebaseapp.com",
@@ -15,10 +15,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
-const messaging = firebase.messaging();
-
+const messaging = getMessaging();
 // async function requestPermission() {
 //   console.log("권한 요청 즁");
 
@@ -42,22 +40,18 @@ const messaging = firebase.messaging();
 //   });
 // }
 
-messaging
-  .requestPermission()
-  .then(function () {
-    console.log("허가");
-    return messaging.getToken();
+getToken(messaging, {
+  vapidKey: import.meta.env.REACT_APP_VAPID_KEY,
+})
+  .then((currentToken) => {
+    if (currentToken) {
+      console.log("currentToken", currentToken);
+    } else {
+      console.log("No registration");
+    }
   })
-  .then(function (token) {
-    console.log(token);
-  })
-  .catch(function (err) {
-    console.log("fcm에러:", err);
-  });
+  .catch((e) => console.log("err:", e));
 
-// requestPermission();
-
-messaging.onMessage(function (payload) {
-  console.log(payload.notification.title);
-  console.log(payload.notification.body);
+onMessage(messaging, (payload) => {
+  console.log("Message received", payload);
 });

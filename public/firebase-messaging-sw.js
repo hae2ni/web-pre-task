@@ -1,6 +1,7 @@
-importScripts("https://www.gstatic.com/firebasejs/4.8.1/firebase-app.js");
-importScripts("https://www.gstatic.com/firebasejs/4.8.1/firebase-messaging.js");
-
+// importScripts("https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js");
+// importScripts("https://www.gstatic.com/firebasejs/9.5.0/firebase-messaging.js");
+importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js");
 const firebaseConfig = {
   apiKey: "AIzaSyDNyoLsnDzmay7XS2uB_CIIwuKGx26ZeRk",
   authDomain: "pre-gwasuoneshot.firebaseapp.com",
@@ -13,34 +14,49 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-self.addEventListener("install", function (e) {
-  console.log("fcm sw install,,,");
-  self.skipWaiting();
-});
+const messaging = firebase.messaging();
 
-self.addEventListener("activate", function (e) {
-  console.log("fcm sw activate,,,");
-});
+// self.addEventListener("install", function (e) {
+//   console.log("fcm sw install,,,");
+//   self.skipWaiting();
+// });
 
-self.addEventListener("push", function (e) {
-  console.log("push:", e.data.json());
-  if (!e.data.json()) return;
+// self.addEventListener("activate", function (e) {
+//   console.log("fcm sw activate,,,");
+// });
 
-  const resultData = e.data.json().notification;
-  const notificationTitle = resultData.title;
+// self.addEventListener("push", function (e) {
+//   console.log("push:", e.data.json());
+//   if (!e.data.json()) return;
+
+//   const resultData = e.data.json().notification;
+//   const notificationTitle = resultData.title;
+//   const notificationOptions = {
+//     body: resultData.body,
+//     ...resultData,
+//   };
+//   console.log("push", { resultData, notificationTitle, notificationOptions });
+
+//   self.registration.showNotification(notificationTitle, notificationOptions);
+// });
+
+// self.addEventListener("notificationclick", function (e) {
+//   console.log("notification click");
+
+//   const url = "/";
+//   e.notification.close();
+//   e.waitUntil(clients.openWindow(url));
+// });
+
+messaging.onBackgroundMessage(messaging, (payload) => {
+  console.log("[firebase-messaging-sw.js] Received background message ", payload);
+
+  // Customize notification here
+  const notificationTitle = "Background Message Title";
   const notificationOptions = {
-    body: resultData.body,
-    ...resultData,
+    body: payload,
+    icon: "/firebase-logo.png",
   };
-  console.log("push", { resultData, notificationTitle, notificationOptions });
 
   self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-self.addEventListener("notificationclick", function (e) {
-  console.log("notification click");
-
-  const url = "/";
-  e.notification.close();
-  e.waitUntil(clients.openWindow(url));
 });
